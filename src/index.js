@@ -19,7 +19,7 @@ const database = getFirestore(app);
 const utilisateurs = collection(database, 'utilisateurs');
 const users = collection(database, 'users');
 
-const h3 = document.querySelector('.noms')
+const tbody = document.getElementById('tbody')
 
 const addUsersForm = document.querySelector('.ajouter');
 
@@ -35,3 +35,30 @@ addUsersForm.addEventListener('submit', (e)=>{
     }).then(()=> addUsersForm.reset());
 })
 
+async function getUsersFromFirebase() {
+  try {
+    const usersCollection = collection(database, 'users')
+
+    // Recuperer tout les users de la collection
+    const querySnapshot = await getDocs(usersCollection);
+
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ",  doc.data(),);
+      const usersData = doc.data();
+
+      tbody.innerHTML += `
+        <tr>
+        <td>${doc.id}</td>
+        <td>${usersData.nom}</td>
+        <td>${usersData.prenom}</td>
+        <td>${usersData.age}</td>
+        <td>${usersData.adulte}</td>
+  </tr>
+      `;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+getUsersFromFirebase()
