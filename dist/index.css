@@ -1,0 +1,22 @@
+input,
+select,
+button {
+    margin-top: 10px;
+    width: 200px;
+    height: 50px;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 100vh;
+}
+
+table {
+    border: 2px solid grey;
+    width: calc(100vw - 50px);
+    text-align: center;
+}
