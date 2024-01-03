@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import{ addDoc, collection, getDocs, getFirestore } from "firebase/firestore"
+import{ addDoc, collection, getDocs, getFirestore, onSnapshot } from "firebase/firestore"
 const firebaseConfig = {
   apiKey: "AIzaSyDreKIlxuFFWmzp8vX1mGCt1BnKlMj653E",
   authDomain: "fir-testm-f5dc1.firebaseapp.com",
@@ -31,7 +31,7 @@ addUsersForm.addEventListener('submit', (e)=>{
         nom : addUsersForm.nom.value,
         prenom: addUsersForm.prenom.value,
         age: addUsersForm.age.value,
-        adulte: addUsersForm.adulte.value === 'true' ? true : false, 
+        adulte: addUsersForm.age.value >= 18 ? true : false
     }).then(()=> addUsersForm.reset());
 })
 
@@ -39,23 +39,28 @@ async function getUsersFromFirebase() {
   try {
     const usersCollection = collection(database, 'users')
 
-    // Recuperer tout les users de la collection
-    const querySnapshot = await getDocs(usersCollection);
+    const usersList = [];
 
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ",  doc.data(),);
-      const usersData = doc.data();
+    onSnapshot(usersCollection, (querySnapshot) => {
+      // vider la liste 
+      tbody.innerHTML = ''
+      usersList.length = 0;
 
-      tbody.innerHTML += `
-        <tr>
-        <td>${doc.id}</td>
-        <td>${usersData.nom}</td>
-        <td>${usersData.prenom}</td>
-        <td>${usersData.age}</td>
-        <td>${usersData.adulte}</td>
-  </tr>
-      `;
-    });
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ",  doc.data(),);
+        usersList.push({id : doc.id, ...doc.data()})
+        const usersData = doc.data();
+        tbody.innerHTML += `
+    <tr>
+          <td>${usersData.nom}</td>
+          <td>${usersData.prenom}</td>
+          <td>${usersData.age}</td>
+          <td>${usersData.adulte}</td>
+    </tr>
+        `;
+      });
+    })
+   
   } catch (error) {
     console.log(error);
   }
