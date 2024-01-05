@@ -96,8 +96,19 @@ async function getUsersFromFirebase() {
             deleteButton.forEach(button => {
               button.addEventListener('click', (e)=> {
                 const users_Id = e.target.id;
-                  deleteDoc(doc(users, users_Id))
-                  getUsersFromFirebase()
+                const confirmation = confirm("Voulez-vous vraiment supprimer cet utilisateur ? ");
+                if (confirmation) {
+                  try {
+                    deleteDoc(doc(users, users_Id));
+                    alert("Utilisateur supprimer avec success")
+                    console.log("Utilisateur supprimer avec success");
+                  } catch (error) {
+                    alert("Erreur lors de la suppression de l'utilisateur")
+                    console.log("Erreur lors de la suppression de l'utilisateur", error);
+                  }
+                } else {
+                  alert('Annuler')
+                }
               })
             });
         });
@@ -118,11 +129,5 @@ window.updateUsersInfos = function updateUsersInfos(id, nom, prenom, age) {
   // Mettre à jour le texte du bouton de soumission
   addUsersForm.querySelector('button').textContent = "Mettre à jour";
 };
-
-
-// fonction pour supprimer un utilisateur 
-
-
-
 
 getUsersFromFirebase();
