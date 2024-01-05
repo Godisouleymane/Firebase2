@@ -1,6 +1,8 @@
-// Import the functions you need from the SDKs you need
+// Import des fonctions dont vous avez besoin à partir des SDKs
 import { initializeApp } from "firebase/app";
-import{ addDoc, collection, doc, getDocs, getFirestore, onSnapshot, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
+
+// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDreKIlxuFFWmzp8vX1mGCt1BnKlMj653E",
   authDomain: "fir-testm-f5dc1.firebaseapp.com",
@@ -10,112 +12,117 @@ const firebaseConfig = {
   appId: "1:897653381336:web:570409c1b47776df5d5fad"
 };
 
-// Initialize Firebase
+// Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 
-// initialisation des services
+// Initialisation des services
 const database = getFirestore(app);
-
-const utilisateurs = collection(database, 'utilisateurs');
 const users = collection(database, 'users');
-
-const tbody = document.getElementById('tbody')
-
+const tbody = document.getElementById('tbody');
 const addUsersForm = document.querySelector('.ajouter');
 
-addUsersForm.addEventListener('submit', async (e)=>{
+// Gestionnaire d'événement pour le formulaire
+addUsersForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-  // recuperer les donnees du formulaire;
-  const id = addUsersForm.userId.value;
-  const nom = addUsersForm.nom.value;
-  const prenom = addUsersForm.prenom.value;
-  const age = addUsersForm.age.value;
-  const adulte = addUsersForm.age.value >= 18 ? true : false;
+    // Récupérer les données du formulaire
+    const id = addUsersForm.userId.value;
+    const nom = addUsersForm.nom.value;
+    const prenom = addUsersForm.prenom.value;
+    const age = addUsersForm.age.value;
+    const adulte = age >= 18 ? true : false;
+    if (id) {
+        // Mettre à jour l'utilisateur dans la base de données en utilisant l'Id;
+        try {
+            await updateDoc(doc(users, id), {
+                nom: nom,
+                prenom: prenom,
+                age: age,
+            });
 
-  if (id) {
-    // Mettre a jour l'utilisateur dans la base de donnees en utilisant l'Id;
-
-    try {
-      await updateDoc(doc(users, id), {
+            addUsersForm.reset();
+            addUsersForm.userId.value = '';
+            getUsersFromFirebase();
+        } catch (error) {
+            console.log('Erreur lors de la modification de l\'utilisateur : ', error);
+        }
+    } else {
+        // Ajouter un nouvel utilisateur;
+        try {
+            await addDoc(users, {
                 nom: nom,
                 prenom: prenom,
                 age: age,
                 adulte: adulte
-      });
-      
-      addUsersForm.reset();
+            }).then(() => addUsersForm.reset());
 
-      addUsersForm.userId.value = '';
-
-      getUsersFromFirebase();
-    } catch (error) {
-      console.log('Erreur lors de la modification de l\'utilisateur : ', error);
+            getUsersFromFirebase();
+        } catch (error) {
+            console.log("Erreur lors de l'ajout d'un nouvel utilisateur : ", error);
+        }
     }
+});
 
-  } else {
-    // Ajouter un nouvel utilisateur;
-    try {
-      await addDoc(users, {
-        nom : addUsersForm.nom.value,
-        prenom: addUsersForm.prenom.value,
-        age: addUsersForm.age.value,
-        adulte: addUsersForm.age.value >= 18 ? true : false
-      }).then(() => addUsersForm.reset());
-      
-      getUsersFromFirebase();
-
-    } catch (error) {
-      console.log("Erruer lors de l'ajout d'un nouvel utilisateur : ", error);
-    }
-  }
- 
-})
-
+// Fonction pour récupérer les utilisateurs depuis Firebase
 async function getUsersFromFirebase() {
-  try {
-    const usersCollection = collection(database, 'users')
+    try {
+        const usersCollection = collection(database, 'users');
+        const usersList = [];
 
-    const usersList = [];
+        onSnapshot(usersCollection, (querySnapshot) => {
+            // Vider la liste
+            tbody.innerHTML = '';
+            usersList.length = 0;
 
-    onSnapshot(usersCollection, (querySnapshot) => {
-      // vider la liste 
-      tbody.innerHTML = ''
-      usersList.length = 0;
+            querySnapshot.forEach((doc) => {
+                console.log(doc.id, " => ",  doc.data());
+                usersList.push({ id: doc.id, ...doc.data() });
+                const usersData = doc.data();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${usersData.nom}</td>
+                        <td>${usersData.prenom}</td>
+                        <td>${usersData.age}</td>
+                        <td>${usersData.adulte}</td>
+                        <td>
+                            <button onclick="updateUsersInfos('${doc.id}', '${usersData.nom}', '${usersData.prenom}', '${usersData.age}')">Modifier</button> / <button id="${doc
+                            .id}" class="deleteButton">Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
 
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ",  doc.data(),);
-        usersList.push({id : doc.id, ...doc.data()})
-        const usersData = doc.data();
-        tbody.innerHTML += `
-    <tr>
-          <td>${usersData.nom}</td>
-          <td>${usersData.prenom}</td>
-          <td>${usersData.age}</td>
-          <td>${usersData.adulte}</td>
-          <td> <button onclick="updateUsersInfos('${doc.id}', '${usersData.nom}', '${usersData.prenom}', '${usersData.age}', '${usersData.adulte}')">Modifier</button> / <button>Supprimer</button>
-          </td>
-    </tr>
-        `;
-      });
-    })
-   
-  } catch (error) {
-    console.log(error);
-  }
+            const deleteButton = document.querySelectorAll('.deleteButton');
+            deleteButton.forEach(button => {
+              button.addEventListener('click', (e)=> {
+                const users_Id = e.target.id;
+                  deleteDoc(doc(users, users_Id))
+                  getUsersFromFirebase()
+              })
+            });
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
-getUsersFromFirebase()
+// Fonction pour remplir le formulaire avec les données de l'utilisateur sélectionné
 
-function updateUsersInfos(id, nom, prenom, age, adulte) {
-  // Remplir les champs du formulaire avec les donnees d'utilisateur;
-
+window.updateUsersInfos = function updateUsersInfos(id, nom, prenom, age) {
+  // Remplir les champs du formulaire avec les données d'utilisateur;
   addUsersForm.userId.value = id;
   addUsersForm.nom.value = nom;
   addUsersForm.prenom.value = prenom;
-  addUsersForm.age.value = age;
-  addUsersForm.age.value = adulte
+  addUsersForm.age.value = age.toString();
 
-  // Mettre a jour le texte du boutton de soumission
-  addUsersForm.querySelector('button').textContent = "Mettre a jour"
-}
+  // Mettre à jour le texte du bouton de soumission
+  addUsersForm.querySelector('button').textContent = "Mettre à jour";
+};
+
+
+// fonction pour supprimer un utilisateur 
+
+
+
+
+getUsersFromFirebase();
