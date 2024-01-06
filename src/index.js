@@ -85,7 +85,7 @@ async function getUsersFromFirebase() {
                         <td>${usersData.age}</td>
                         <td>${usersData.adulte}</td>
                         <td>
-                            <button onclick="updateUsersInfos('${doc.id}', '${usersData.nom}', '${usersData.prenom}', '${usersData.age}')">Modifier</button> / <button id="${doc
+                            <button class="editButton" onclick="updateUsersInfos('${doc.id}', '${usersData.nom}', '${usersData.prenom}', '${usersData.age}')">Modifier</button> / <button id="${doc
                             .id}" class="deleteButton">Supprimer</button>
                         </td>
                     </tr>

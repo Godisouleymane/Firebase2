@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="home.css">
+    <title>Firebase_test</title>
+</head>
+<body>
+    <form class="ajouter">
+        <input type="hidden" id="userId" name="userId">
+        <label for="nom">Nom</label>
+        <input type="text" name="nom" placeholder="Entrez votre nom" required> <br>
+        <label for="prenom">Prenom</label>
+        <input type="text" name="prenom" placeholder="Entrez votre prenom" required> <br>
+        <label for="number">Age</label>
+        <input type="number" name="age" placeholder="Entrez votre age"> <br> <br>
+        <button id="send">Envoyer</button>
+    </form>
+
+    <div class="user_infos">
+        <h1>Users Infos</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom </th>
+                    <th>prenom </th>
+                    <th>Age </th>
+                    <th>Est Adulte ? </th>
+                    <th>Option</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+              
+            </tbody>
+        </table>
+    </div>
+    <script defer src="./bundle.js"></script>
+</body>
+</html>
