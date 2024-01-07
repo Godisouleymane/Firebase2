@@ -14,7 +14,7 @@ body {
     text-align: center;
 }
 .container {
-    background-color: rgba(99, 96, 96, 0.597);
+    background-color: rgba(96, 96, 96, 0.307);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -29,6 +29,14 @@ input {
     border: none;
     padding-left: 10px;
     outline: none;
+}
+
+.signup {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .signIn {

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 
-import { GoogleAuthProvider, getAuth, signInWithRedirect } from "firebase/auth"
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithRedirect } from "firebase/auth"
 
 // Configuration Firebase
 const firebaseConfig = {
@@ -26,3 +26,25 @@ signInGoogleBtn.addEventListener('click', ()=> {
 
 // Recuperer l'etat de connexion de l'utilisateur 
 
+// onAuthStateChanged(auth, (user)=> {
+//     console.log("Changement du status de l'utilisateur:", user);
+// })
+
+
+// Inscription de l'utilisateur
+
+const signUpForm = document.querySelector('.signup');
+
+signUpForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const email = signUpForm.email.value;
+    const password = signUpForm.password.value;
+
+    createUserWithEmailAndPassword(auth, email, password).then((cred)=> {
+        console.log("L'utilisateur inscrit:", cred.user);
+        signUpForm.reset();
+    }).catch((err)=> {
+        console.log(err.message);
+    });
+})
